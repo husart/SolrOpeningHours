@@ -29,7 +29,9 @@ You can now restart solr.
 ## How to index
 
 `Z` - day of the week: numeric representation 1 (for Monday) through 7 (for Sunday)
+
 `H` - hour: for exemple 1200 means 12:00
+
 `D` - day: it contains month and day for exemple 0212 means 12 February
 
 There are 4 types:
