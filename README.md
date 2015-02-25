@@ -15,11 +15,13 @@ Create a folder named `lib` (in the same folder which contains `conf` and `data`
 
 Copy `openinghoursfilter.jar` (your exported jar) and  the files from `lib` project folder into the previously created `lib` folder.
 
-Edit `solrconfig.xml` and add the following lines directly under the <config> tag.
+Edit `solrconfig.xml` and add the following lines directly under the `<config>` tag.
 
 ```xml
 <lib dir="../lib/" regex=".*\.jar" />
- <valueSourceParser name="openingHoursFCT" class="husart.solr.openinghours.OpeningHoursParser" />  
+
+<valueSourceParser name="openingHoursFCT"
+      class="husart.solr.openinghours.OpeningHoursParser" />  
 ```
   
 `openingHoursFCT` is the function that will be use in your query, you can change the name.
@@ -44,13 +46,39 @@ Priority order: -D, -DD, DHH, ZDDHH, ZHH.
 
 Your field must be the type string and not multivalue.
 
-The content must be sorted by priority and intervals delimited by `;`. In `php` folder you can find the function `opening_hours_normalize()` wich recives an array of intervals and return a string sorted by priority.
+The content must be sorted by priority and intervals delimited by `;`. In `php` folder you can find the function `opening_hours_normalize()` wich receives an array of intervals and return a string sorted by priority.
 
 For ex:
- if you have the next intervals: `array('10212031208001800', '-0213', '102120312019002000', '20212031208001800','209001200', '109001200', '409001200','031312001400', '309001200', '509001200', '30212031208001800', '40212031208001800', '50212031208001800')`
+ if you have the next intervals:
+ 
+ ```php
+[
+  '10212031208001800',
+  '-0213',
+  '102120312019002000',
+  '20212031208001800',
+  '209001200',
+  '109001200',
+  '409001200',
+  '031312001400',
+  '309001200',
+  '509001200',
+  '30212031208001800',
+  '40212031208001800',
+  '50212031208001800'
+]
+```
  the function will return `'-0213;031312001400;50212031208001800;40212031208001800;30212031208001800;20212031208001800;10212031208001800;509001200;409001200;309001200;209001200;109001200;'`.
 
 After indexing data you can test in your query:
 `{!frange l=1}YOUR_FUNC_NAME(YOUR_FIELD, DATE, HOUR, YEAR)`, where year is optional, default is current year - ex `{!frange l=1}openingHoursFCT(hours_field, 212,1300)` means 12 February at 13:00.
 
- The function will return only the open ones.
+The function will return only the open ones. If you want to get the closed ones, just replace l=1 with u=0 inside the frange. Ex: `{!frange u=0}YOUR_FUNC_NAME(YOUR_FIELD, DATE, HOUR, YEAR)`
+ 
+## TODO
+
+ - support for multivalued fields
+ - json parser
+ - more examples
+
+ 
