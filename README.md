@@ -2,6 +2,7 @@
 ===============
 
 This plugin provides a Solr FunctionQueries that parses opening hours and checks if is open at a date and a specified hour. It returns a boolean.
+
 Currently this repo contains an eclipse project but will be changed soon. You can download the project and import it in your eclipse workspace.
 
 ## How to build
@@ -40,11 +41,14 @@ There are 4 types:
 Priority order: -D, -DD, DHH, ZDDHH, ZHH.
 
 Your field must be the type string and not multivalue.
+
 The content must be sorted by priority and intervals delimited by `;`. In `php` folder you can find the function `opening_hours_normalize()` wich recives an array of intervals and return a string sorted by priority.
+
 For ex:
  if you have the next intervals: `array('10212031208001800', '-0213', '102120312019002000', '20212031208001800','209001200', '109001200', '409001200','031312001400', '309001200', '509001200', '30212031208001800', '40212031208001800', '50212031208001800')`
  the function will return `'-0213;031312001400;50212031208001800;40212031208001800;30212031208001800;20212031208001800;10212031208001800;509001200;409001200;309001200;209001200;109001200;'`.
 
 After indexing data you can test in your query:
 `{!frange l=1}YOUR_FUNC_NAME(YOUR_FIELD, DATE, HOUR, YEAR)`, where year is optional, default is current year - ex `{!frange l=1}openingHoursFCT(hours_field, 212,1300)` means 12 February at 13:00.
- The function will return only the open.
+
+ The function will return only the open ones.
