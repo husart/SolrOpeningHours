@@ -26,7 +26,7 @@ public class OpeningHoursFunction extends ValueSource {
 		this.field = field;
 		this.date = date;
 		this.hour = hour;
-		this.year = calendar.get(Calendar.YEAR); 
+		this.year = calendar.get(Calendar.YEAR);  // current year
 	}
 	public OpeningHoursFunction(ValueSource field, int date, int hour, int year) {
 		this(field, date, hour);
@@ -52,33 +52,34 @@ public class OpeningHoursFunction extends ValueSource {
 		if (max == 0) {
 			return false;
 		}
-		long nr = 0;
-		int length = 0;
+		long nr = 0; //interval
+		int length = 0; // type
 		boolean close = false;		
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(year, date / 100 - 1, date % 100);
 		int currentD = calendar.get(Calendar.DAY_OF_WEEK);
 		calendar = null;
 		
+		// Because Sunday is 1, we must decrement and set Sunday to 7, so that Monday is 1
 		if (--currentD == 0) {
 			currentD = 7;
 		}
-		int cType = 0;
-		int firstDigit = 0;	
+		int cType = 0; // will be use for checking if the next interval has the same type
+		int firstDigit = 0;	// will be use for day of week
 		
 		for (int i = 0; i < max; i++) {
-			if (bytes[i] == '-') {
+			if (bytes[i] == '-') { // check if is closed
 				close = true;
 				continue;
 			}
-			
+			// Check if is a number
 			if (bytes[i] >= '0' && bytes[i] <= '9') {
-				if (firstDigit == 0) {
+				if (firstDigit == 0) { // set firstDigit with the day of week
 					firstDigit = bytes[i] - '0';
 				}
-				nr = nr * 10 + bytes[i] - '0';
+				nr = nr * 10 + bytes[i] - '0';  
 				length++;
-			} else if (bytes[i] == ';') {
+			} else if (bytes[i] == ';') { // finished format interval
 				if (close) {
 					if (date == nr || (length > 4 &&  date >= nr / 10000 && date <= nr %10000) ) {
 						return false;
@@ -87,10 +88,11 @@ public class OpeningHoursFunction extends ValueSource {
 					continue;
 				}
 				
-				if (cType > 0 && length != cType) {
+				if (cType > 0 && length != cType) { // not the same type as previous
 					return false;
 				}
 				
+				// Check if is open
 				switch (length) {
 				case DHH:  
 					if (date == nr / 100000000L) {
@@ -142,7 +144,7 @@ public class OpeningHoursFunction extends ValueSource {
 			
 			@Override
 			public boolean boolVal(int doc) {
-				String code = fieldValue.strVal(doc);
+				String code = fieldValue.strVal(doc); // get field value
 				if (code == null) {
 					return false;
 				}
